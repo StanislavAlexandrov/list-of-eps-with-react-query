@@ -11,7 +11,6 @@ export default function App() {
   const queryClient = new QueryClient();
   const [list, setList] = useState();
   const [formReq, setFormReq] = useState('');
-  const [link, setLink] = useState('');
 
   const [reqLink, setReqLink] = useState(
     'https://api.tvmaze.com/singlesearch/shows?q=girls'
@@ -42,9 +41,10 @@ export default function App() {
   };
 
   const handleClick = () => {
-    setReqLink('');
+    // setReqLink('');
     setReqLink('https://api.tvmaze.com/singlesearch/shows?q=' + formReq);
-    setAllEpsLink(epLink);
+
+    setAllEpsLink('https://api.tvmaze.com/shows/' + showId + '/episodes');
   };
 
   const handleKeypress = (e) => {
@@ -53,14 +53,13 @@ export default function App() {
     }
   };
 
-  const epLink = 'https://api.tvmaze.com/shows/' + showId + '/episodes';
   const QueryTest = () => {
     const { isLoading, error, data } = useQuery(['repoData'], () =>
       fetch(reqLink).then((res, req) => res.json())
     );
     if (isLoading) return 'Loading...';
     if (error) return 'An error has occurred: ' + error.message;
-    else return <div>{data?.name}</div>;
+    else return <div>from react query: {data?.name}</div>;
   };
 
   const MemoizedQueryTest = memo(QueryTest);
@@ -77,13 +76,14 @@ export default function App() {
       </button>
       <div>{list && list.name}</div>
       <QueryClientProvider client={queryClient}>
-        <MemoizedQueryTest />
+        <QueryTest />
       </QueryClientProvider>
       <div>
         {allEps &&
           allEps.map((ep) => (
             <li>
-              s{ep.season}e{ep.number} - {ep.name}
+              s{ep.season < 10 ? '0' + ep.season : ep.season}e
+              {ep.number < 10 ? '0' + ep.number : ep.number} - {ep.name}
             </li>
           ))}
       </div>
