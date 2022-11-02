@@ -16,11 +16,26 @@ export default function App() {
   const [reqLink, setReqLink] = useState(
     'https://api.tvmaze.com/singlesearch/shows?q=girls'
   );
+
+  const [allEpsLink, setAllEpsLink] = useState(
+    'https://api.tvmaze.com/shows/1/episodes'
+  );
+
+  const [allEps, setAllEps] = useState('');
+
   useEffect(() => {
     fetch(reqLink)
       .then((res) => res.json())
       .then((data) => setList(data));
   }, [reqLink]);
+
+  useEffect(() => {
+    fetch(allEpsLink)
+      .then((res) => res.json())
+      .then((data) => setAllEps(data));
+  }, [allEpsLink]);
+
+  const showId = list?.id;
 
   const handleChange = (e) => {
     setFormReq(e.target.value);
@@ -29,6 +44,7 @@ export default function App() {
   const handleClick = () => {
     setReqLink('');
     setReqLink('https://api.tvmaze.com/singlesearch/shows?q=' + formReq);
+    setAllEpsLink(epLink);
   };
 
   const handleKeypress = (e) => {
@@ -37,6 +53,7 @@ export default function App() {
     }
   };
 
+  const epLink = 'https://api.tvmaze.com/shows/' + showId + '/episodes';
   const QueryTest = () => {
     const { isLoading, error, data } = useQuery(['repoData'], () =>
       fetch(reqLink).then((res, req) => res.json())
@@ -62,6 +79,14 @@ export default function App() {
       <QueryClientProvider client={queryClient}>
         <MemoizedQueryTest />
       </QueryClientProvider>
+      <div>
+        {allEps &&
+          allEps.map((ep) => (
+            <li>
+              s{ep.season}e{ep.number} - {ep.name}
+            </li>
+          ))}
+      </div>
     </>
   );
 }
